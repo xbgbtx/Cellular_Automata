@@ -122,7 +122,7 @@ function get_local_idxs ( idx, w, h )
 
 function randomize_buffer ( b, max )
 {
-    let off = 0.02;
+    let off = 0.001 + random () * 0.2;
 
     noiseSeed ( random () * 10000 );
     b.forEach ( ( v, i, a ) =>
@@ -132,7 +132,8 @@ function randomize_buffer ( b, max )
         let n = noise ( ( i % sim_width ) * off,
                         floor ( i / sim_width ) * off );
 
-        a [ i ] = floor ( n * max );
+        a [ i ] = floor(map ( n, 0, 1, 0, 4 ));
+        //a [ i ] = floor ( n * max );
     });
 }
 
