@@ -22,7 +22,7 @@ function draw ()
 
     buffer_0.forEach ( ( val, idx ) =>
     {
-        buffer_1 [ idx ] = Math.floor ( Math.random () * 255 );
+        buffer_1 [ idx ] = idx % 255;
 
         draw_cell ( idx, val );
     });
@@ -39,7 +39,7 @@ function draw_cell ( idx, val )
     fill ( color ( val, 255, 255, 255 ) );
 
     rect ( ( idx % sim_width ) * ( screen_width / sim_width ), 
-           ( idx / sim_height ) * ( screen_height / sim_height ),
+           Math.floor( idx / sim_height ) * ( screen_height / sim_height ),
         10, 10 );
 }
 
