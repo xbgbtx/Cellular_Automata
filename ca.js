@@ -8,8 +8,8 @@ const sim_size = sim_width * sim_height;
 const cell_width = screen_width / sim_width;
 const cell_height = screen_height / sim_height;
 
-const state_count = 4;
-const state_bits = 2;
+const state_count = 2;
+const state_bits = 1;
 const state_buffer_size = Math.pow ( state_count, 9 );
 
 let state_buffer;
@@ -122,7 +122,7 @@ function get_local_idxs ( idx, w, h )
 
 function randomize_buffer ( b, max )
 {
-    let off = 0.001 + random () * 0.2;
+    let off = 0.0001 + random () * 0.05;
 
     noiseSeed ( random () * 10000 );
     b.forEach ( ( v, i, a ) =>
@@ -132,7 +132,7 @@ function randomize_buffer ( b, max )
         let n = noise ( ( i % sim_width ) * off,
                         floor ( i / sim_width ) * off );
 
-        a [ i ] = floor(map ( n, 0, 1, 0, 4 ));
+        a [ i ] = floor(map ( n, 0.2, 0.8, 0, max-0.01, true ));
         //a [ i ] = floor ( n * max );
     });
 }
