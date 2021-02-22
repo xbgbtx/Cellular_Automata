@@ -1,11 +1,11 @@
 let screen_width = 640;
 let screen_height = 640;
 
-let sim_width = 128;
-let sim_height = 128;
+let sim_width = 64;
+let sim_height = 64;
 let sim_size = sim_width * sim_height;
 
-let state_count = 2;
+let state_count = 4;
 let state_buffer_size = Math.pow ( state_count, 9 );
 let state_buffer;
 
@@ -54,11 +54,12 @@ function flip_sim_buffers ()
 
 function cell_next ( val, idx, arr )
 {
-    let local_vals = get_local_idxs ( idx ).map ( l => arr [ l ] )
+    let local_idxs = get_local_idxs ( idx, sim_width, sim_height );
+    let local_vals = local_idxs.map ( l => arr [ l ] )
 
     let next_state = local_vals.reduce ( ( acc, val, idx ) =>
     {
-        return acc + ( val << ( idx * 8 ) );
+        return acc | ( val << ( idx * 8 ) );
     });
 
     return state_buffer [ next_state ];
@@ -71,22 +72,20 @@ function draw_cell ( val, idx )
 
     rect ( ( idx % sim_width ) * ( screen_width / sim_width ), 
            Math.floor( idx / sim_height ) * ( screen_height / sim_height ),
-        10, 10 );
+        screen_width / sim_width, screen_height / sim_height );
 }
 
-function get_local_idxs ( idx )
+function get_local_idxs ( idx, w, h )
 {
-    let i_x = idx % sim_width;
-    let i_y = Math.floor ( idx / sim_height );
+    let i_x = idx % w;
+    let i_y = Math.floor ( idx / w );
 
-    let w = sim_width;
-    let h = sim_height;
 
     //offset an x or y coord and wrap on grid
     let offs = ( v, m, a ) => ( v + m + ( a % m ) ) % m;
 
     //x,y to buffer idx
-    let c2i = ( x, y ) => ( x % w ) + ( y * h );
+    let c2i = ( x, y ) => x + ( y * w );
 
     let adj = ( o_x, o_y ) => c2i ( offs ( i_x, w, o_x ),
                                     offs ( i_y, h, o_y ) );
