@@ -1,11 +1,11 @@
 let screen_width = 640;
 let screen_height = 640;
 
-let sim_width = 64;
-let sim_height = 64;
+let sim_width = 128;
+let sim_height = 128;
 let sim_size = sim_width * sim_height;
 
-let state_count = 3;
+let state_count = 2;
 let state_buffer_size = Math.pow ( state_count, 9 );
 let state_buffer;
 
@@ -20,9 +20,11 @@ function setup ()
 
     state_buffer = new Uint8ClampedArray ( state_buffer_size );
 
-    randomize_state_buffer ();
+    randomize_buffer ( state_buffer, state_count );
+    randomize_buffer ( sim_buffer_0, state_count );
 
     colorMode ( HSB, 255 );
+    //frameRate ( 3 );
 }
 
 function draw () 
@@ -31,26 +33,35 @@ function draw ()
 
     sim_buffer_0.forEach ( ( val, idx, arr ) =>
     {
+        draw_cell ( val, idx );
+
         let next_val = cell_next ( val, idx, arr );
 
-        draw_cell ( next_val, idx );
+        sim_buffer_1 [ idx ] = next_val;
     });
 
+    flip_sim_buffers ();
+    //noLoop ();
+}
+
+function flip_sim_buffers ()
+{
     let tmp = sim_buffer_0;
     sim_buffer_0 = sim_buffer_1;
     sim_buffer_1 = tmp;
-
-    noLoop ();
 }
+
 
 function cell_next ( val, idx, arr )
 {
     let local_vals = get_local_idxs ( idx ).map ( l => arr [ l ] )
 
-    console.log ( local_vals );
+    let next_state = local_vals.reduce ( ( acc, val, idx ) =>
+    {
+        return acc + ( val << ( idx * 8 ) );
+    });
 
-    return idx % state_count;
-    //return  Math.floor ( Math.random () * state_count );
+    return state_buffer [ next_state ];
 }
 
 function draw_cell ( val, idx ) 
@@ -88,8 +99,8 @@ function get_local_idxs ( idx )
 
 }
 
-function randomize_state_buffer ()
+function randomize_buffer ( b, max )
 {
-    state_buffer.forEach ( ( val, idx, arr ) => arr [ idx ] = Math.floor ( Math.random () * state_count ) );
+    b.forEach ( ( v, i, a ) => a [ i ] = floor ( random () * max ) );
 }
 
