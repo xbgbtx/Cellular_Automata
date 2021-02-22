@@ -3,10 +3,12 @@ let screen_height = 640;
 
 let sim_width = 64;
 let sim_height = 64;
+let sim_size = sim_width * sim_height;
 
+let state_count = 3;
 let state_buffer_size = Math.pow ( state_count, 9 );
-
 let state_buffer;
+
 let sim_buffer_0, sim_buffer_1;
 
 function setup ()
@@ -43,7 +45,11 @@ function draw ()
 
 function cell_next ( val, idx, arr )
 {
-    //return idx % state_count;
+    let local_vals = get_local_idxs ( idx ).map ( l => arr [ l ] )
+
+    console.log ( local_vals );
+
+    return idx % state_count;
     //return  Math.floor ( Math.random () * state_count );
 }
 
@@ -57,38 +63,33 @@ function draw_cell ( val, idx )
         10, 10 );
 }
 
-function get_neighbour ( idx, n )
+function get_local_idxs ( idx )
 {
-    let row_adj, col_adj;
+    let i_x = idx % sim_width;
+    let i_y = Math.floor ( idx / sim_height );
 
-    switch ( n )
-    {
-        case 0 : row_adj = -1; col_adj = -1; break;
-        case 1 : row_adj = -1; col_adj =  0; break;
-        case 2 : row_adj = -1; col_adj =  1; break;
-        case 3 : row_adj =  0; col_adj = -1; break;
-        case 4 : row_adj =  0; col_adj =  1; break;
-        case 5 : row_adj =  1; col_adj = -1; break;
-        case 6 : row_adj =  1; col_adj =  0; break;
-        case 7 : row_adj =  1; col_adj =  1; break;
-    }
+    let w = sim_width;
+    let h = sim_height;
 
-    let n_idx = idx + row_adj * sim_width;
+    //offset an x or y coord and wrap on grid
+    let offs = ( v, m, a ) => ( v + m + ( a % m ) ) % m;
 
-    if ( n_idx < 0 || n_idx > sim_size )
-        return -1;
+    //x,y to buffer idx
+    let c2i = ( x, y ) => ( x % w ) + ( y * h );
 
-    if ( ( n_idx % sim_width ) + col_adj < 0      || 
-         ( n_idx % sim_width ) + col_adj >= sim_width )
-        return -1;
+    let adj = ( o_x, o_y ) => c2i ( offs ( i_x, w, o_x ),
+                                    offs ( i_y, h, o_y ) );
 
-    return n_idx + col_adj;
+    return [ 
+        adj ( -1, -1 ), adj (  0, -1 ), adj (  1, -1 ),
+        adj ( -1,  0 ), adj (  0,  0 ), adj (  1,  0 ),
+        adj ( -1,  1 ), adj (  0,  1 ), adj (  1,  1 )
+    ];
 
 }
 
 function randomize_state_buffer ()
 {
-    state_buffer.forEach ( ( val, idx, arr ) 
-        => arr [ idx ] = Math.floor ( Math.random () * state_count ) );
+    state_buffer.forEach ( ( val, idx, arr ) => arr [ idx ] = Math.floor ( Math.random () * state_count ) );
 }
 
