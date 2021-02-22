@@ -1,15 +1,27 @@
-let screen_width = 640;
-let screen_height = 640;
+const screen_width = 640;
+const screen_height = 640;
 
-let sim_width = 64;
-let sim_height = 64;
-let sim_size = sim_width * sim_height;
+const sim_width = 128;
+const sim_height = 128;
+const sim_size = sim_width * sim_height;
 
-let state_count = 2;
-let state_buffer_size = Math.pow ( state_count, 9 );
+const state_count = 4;
+const state_buffer_size = Math.pow ( state_count, 9 );
+
 let state_buffer;
 
 let sim_buffer_0, sim_buffer_1;
+
+let randomise_state_button;
+
+const a = 80;
+const colors = [
+    [ 0, 0, 0, a ],
+    [ 50, 120, 255, a ],
+    [ 0, 255, 250, a ],
+    [ 120, 255, 250, a ],
+    [ 240, 255, 250, a ],
+];
 
 function setup ()
 {
@@ -24,7 +36,14 @@ function setup ()
     randomize_buffer ( sim_buffer_0, state_count );
 
     colorMode ( HSB, 255 );
-    //frameRate ( 3 );
+
+    randomise_state_button = createButton ( 'random rules' );
+    randomise_state_button.position ( 20, screen_height + 100 );
+    randomise_state_button.mousePressed ( () => 
+    {
+        randomize_buffer ( state_buffer, state_count );
+        randomize_buffer ( sim_buffer_0, state_count );
+    });
 }
 
 function draw () 
@@ -60,15 +79,14 @@ function cell_next ( val, idx, arr )
     let next_state = local_vals.reduce ( ( acc, val, idx ) =>
     {
         return acc | ( val << ( idx * 8 ) );
-    }, 0 );
+    });
 
     return state_buffer [ next_state ];
 }
 
 function draw_cell ( val, idx ) 
 {
-    let c = map ( val, 0, state_count, 0, 255 );
-    fill ( color ( c, 255, 255, 255 ) );
+    fill ( ... colors [ val ]);
 
     let x = ( idx % sim_width ) * ( screen_width / sim_width );
     let y = Math.floor ( idx / sim_height ) * ( screen_height / sim_height );
@@ -100,6 +118,17 @@ function get_local_idxs ( idx, w, h )
 
 function randomize_buffer ( b, max )
 {
-    b.forEach ( ( v, i, a ) => a [ i ] = floor ( random () * max ) );
+    let off = 0.25;
+
+    noiseSeed ( random () * 10000 );
+    b.forEach ( ( v, i, a ) =>
+    {
+        //a [ i ] = floor ( random () * max ) );
+
+        let n = noise ( ( i % sim_width ) * off,
+                        floor ( i / sim_width ) * off );
+
+        a [ i ] = floor ( n * max );
+    });
 }
 
