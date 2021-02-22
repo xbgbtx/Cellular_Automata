@@ -5,7 +5,7 @@ let sim_width = 64;
 let sim_height = 64;
 let sim_size = sim_width * sim_height;
 
-let state_count = 4;
+let state_count = 2;
 let state_buffer_size = Math.pow ( state_count, 9 );
 let state_buffer;
 
@@ -60,7 +60,7 @@ function cell_next ( val, idx, arr )
     let next_state = local_vals.reduce ( ( acc, val, idx ) =>
     {
         return acc | ( val << ( idx * 8 ) );
-    });
+    }, 0 );
 
     return state_buffer [ next_state ];
 }
@@ -70,16 +70,16 @@ function draw_cell ( val, idx )
     let c = map ( val, 0, state_count, 0, 255 );
     fill ( color ( c, 255, 255, 255 ) );
 
-    rect ( ( idx % sim_width ) * ( screen_width / sim_width ), 
-           Math.floor( idx / sim_height ) * ( screen_height / sim_height ),
-        screen_width / sim_width, screen_height / sim_height );
+    let x = ( idx % sim_width ) * ( screen_width / sim_width );
+    let y = Math.floor ( idx / sim_height ) * ( screen_height / sim_height );
+
+    rect ( x, y, screen_width / sim_width, screen_height / sim_height );
 }
 
 function get_local_idxs ( idx, w, h )
 {
     let i_x = idx % w;
     let i_y = Math.floor ( idx / w );
-
 
     //offset an x or y coord and wrap on grid
     let offs = ( v, m, a ) => ( v + m + ( a % m ) ) % m;
