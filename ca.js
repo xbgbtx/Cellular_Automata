@@ -1,11 +1,15 @@
 const screen_width = 640;
 const screen_height = 640;
 
-const sim_width = 128;
-const sim_height = 128;
+const sim_width = 160;
+const sim_height = 160;
 const sim_size = sim_width * sim_height;
 
+const cell_width = screen_width / sim_width;
+const cell_height = screen_height / sim_height;
+
 const state_count = 4;
+const state_bits = 2;
 const state_buffer_size = Math.pow ( state_count, 9 );
 
 let state_buffer;
@@ -14,12 +18,12 @@ let sim_buffer_0, sim_buffer_1;
 
 let randomise_state_button;
 
-const a = 80;
+const a = 255;
 const colors = [
     [ 0, 0, 0, a ],
-    [ 50, 120, 255, a ],
-    [ 0, 255, 250, a ],
-    [ 120, 255, 250, a ],
+    [ 50, 100, 255, a ],
+    [ 240, 220, 200, a ],
+    [ 190, 255, 250, a ],
     [ 240, 255, 250, a ],
 ];
 
@@ -76,9 +80,9 @@ function cell_next ( val, idx, arr )
     let local_idxs = get_local_idxs ( idx, sim_width, sim_height );
     let local_vals = local_idxs.map ( l => arr [ l ] )
 
-    let next_state = local_vals.reduce ( ( acc, val, idx ) =>
+    let next_state = local_vals.reduce ( ( a, v, i ) =>
     {
-        return acc | ( val << ( idx * 8 ) );
+        return a | ( v << ( i * state_bits ) );
     });
 
     return state_buffer [ next_state ];
@@ -91,7 +95,7 @@ function draw_cell ( val, idx )
     let x = ( idx % sim_width ) * ( screen_width / sim_width );
     let y = Math.floor ( idx / sim_height ) * ( screen_height / sim_height );
 
-    rect ( x, y, screen_width / sim_width, screen_height / sim_height );
+    rect ( x, y, cell_width, cell_height );
 }
 
 function get_local_idxs ( idx, w, h )
@@ -110,7 +114,7 @@ function get_local_idxs ( idx, w, h )
 
     return [ 
         adj ( -1, -1 ), adj (  0, -1 ), adj (  1, -1 ),
-        adj ( -1,  0 ), adj (  0,  0 ), adj (  1,  0 ),
+        adj ( -1,  0 ),            idx, adj (  1,  0 ),
         adj ( -1,  1 ), adj (  0,  1 ), adj (  1,  1 )
     ];
 
@@ -118,12 +122,12 @@ function get_local_idxs ( idx, w, h )
 
 function randomize_buffer ( b, max )
 {
-    let off = 0.25;
+    let off = 0.02;
 
     noiseSeed ( random () * 10000 );
     b.forEach ( ( v, i, a ) =>
     {
-        //a [ i ] = floor ( random () * max ) );
+        //a [ i ] = floor ( random () * max );
 
         let n = noise ( ( i % sim_width ) * off,
                         floor ( i / sim_width ) * off );
