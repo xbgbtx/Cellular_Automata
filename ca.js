@@ -1,8 +1,8 @@
-const screen_width = 640;
-const screen_height = 640;
+const screen_width = 512;
+const screen_height = 512;
 
-const sim_width = 80;
-const sim_height = 80;
+const sim_width = 64;
+const sim_height = 64;
 const sim_size = sim_width * sim_height;
 
 const cell_width = screen_width / sim_width;
@@ -30,8 +30,8 @@ function setup ()
     sim_buffer_0 = new Uint8ClampedArray ( sim_size );
     sim_buffer_1 = new Uint8ClampedArray ( sim_size );
 
-    rule = new RockPaperScissors ();
-    //rule = new Life ();
+    //rule = new RockPaperScissors ();
+    rule = new Life ();
     //rule = new Majority ();
 
     randomize_buffer ( sim_buffer_0, rule.states );
@@ -112,7 +112,7 @@ function neighbours ( idx, w, h )
 
 function randomize_buffer ( b, max )
 {
-    let off = 0.01 + random () * 0.25;
+    let off = 0.01 + random () * 0.5;
 
     noiseSeed ( random () * 10000 );
     b.forEach ( ( v, i, a ) =>
