@@ -1,14 +1,14 @@
 const screen_width = 640;
 const screen_height = 640;
 
-const sim_width = 160;
-const sim_height = 160;
+const sim_width = 80;
+const sim_height = 80;
 const sim_size = sim_width * sim_height;
 
 const cell_width = screen_width / sim_width;
 const cell_height = screen_height / sim_height;
 
-const state_count = 2;
+let rule;
 
 let sim_buffer_0, sim_buffer_1;
 
@@ -30,15 +30,18 @@ function setup ()
     sim_buffer_0 = new Uint8ClampedArray ( sim_size );
     sim_buffer_1 = new Uint8ClampedArray ( sim_size );
 
-    randomize_buffer ( sim_buffer_0, state_count );
+    rule = new RockPaperScissors ();
+    //rule = new Life ();
+    //rule = new Majority ();
 
+    randomize_buffer ( sim_buffer_0, rule.states );
     colorMode ( HSB, 255 );
 
     randomise_state_button = createButton ( 'random rules' );
     randomise_state_button.position ( 20, screen_height + 100 );
     randomise_state_button.mousePressed ( () => 
     {
-        randomize_buffer ( sim_buffer_0, state_count );
+        randomize_buffer ( sim_buffer_0, rule.states );
     });
 }
 
@@ -69,15 +72,10 @@ function flip_sim_buffers ()
 
 function cell_next ( val, idx, arr )
 {
-    let local_idxs = get_local_idxs ( idx, sim_width, sim_height );
+    let local_idxs = neighbours ( idx, sim_width, sim_height );
     let local_vals = local_idxs.map ( l => arr [ l ] )
 
-    let alive = local_vals.reduce ( ( a, v, i ) =>
-    {
-        return a + ( v == 1 );
-    }, 0);
-
-    return ( alive == 2 || alive == 3 ) ? 1 : 0;
+    return rule.process_cell ( val, local_vals );
 }
 
 function draw_cell ( val, idx ) 
@@ -90,7 +88,7 @@ function draw_cell ( val, idx )
     rect ( x, y, cell_width, cell_height );
 }
 
-function get_local_idxs ( idx, w, h )
+function neighbours ( idx, w, h )
 {
     let i_x = idx % w;
     let i_y = Math.floor ( idx / w );
@@ -106,7 +104,7 @@ function get_local_idxs ( idx, w, h )
 
     return [ 
         adj ( -1, -1 ), adj (  0, -1 ), adj (  1, -1 ),
-        adj ( -1,  0 ),            idx, adj (  1,  0 ),
+        adj ( -1,  0 ),                 adj (  1,  0 ),
         adj ( -1,  1 ), adj (  0,  1 ), adj (  1,  1 )
     ];
 
@@ -114,7 +112,7 @@ function get_local_idxs ( idx, w, h )
 
 function randomize_buffer ( b, max )
 {
-    let off = 0.0001 + random () * 0.05;
+    let off = 0.01 + random () * 0.25;
 
     noiseSeed ( random () * 10000 );
     b.forEach ( ( v, i, a ) =>
@@ -124,7 +122,7 @@ function randomize_buffer ( b, max )
         let n = noise ( ( i % sim_width ) * off,
                         floor ( i / sim_width ) * off );
 
-        a [ i ] = floor(map ( n, 0.2, 0.8, 0, max-0.01, true ));
+        a [ i ] = floor(map ( n, 0.1, 0.9, 0, max-0.01, true ));
         //a [ i ] = floor ( n * max );
     });
 }
