@@ -24,31 +24,52 @@ class Majority
 {
     constructor ()
     {
-        this.states = 3;
+        this.states = 6;
     }
 
     process_cell ( cell, neighbours )
     {
-        let r=0, g=0, b=0;
-
-        for ( const n of neighbours )
+        switch ( cell )
         {
-            switch ( n )
-            {
-                case 0: r+=1; break;
-                case 1: g+=1; break;
-                case 2: b+=1; break;
-            }
-        }
-
-        switch (  Math.max ( r, g, b ) )
-        {
-            case r : return 0;
-            case g : return 1;
-            case b : return 2;
+            case 0 : return neighbours [ 2 ];
+            case 1 : return neighbours [ 7 ];
+            case 2 : return neighbours [ 4 ];
+            case 3 : return neighbours [ 1 ];
+            case 4 : return neighbours [ 6 ];
+            case 5 : 
+                return neighbours
+                    .reduce ( ( a, v ) => ( a + v ) % this.states ); 
         }
     }
 }
+//{
+//    constructor ()
+//    {
+//        this.states = 3;
+//    }
+//
+//    process_cell ( cell, neighbours )
+//    {
+//        let r=0, g=0, b=0;
+//
+//        for ( const n of neighbours )
+//        {
+//            switch ( n )
+//            {
+//                case 0: r+=1; break;
+//                case 1: g+=1; break;
+//                case 2: b+=1; break;
+//            }
+//        }
+//
+//        switch (  Math.max ( r, g, b ) )
+//        {
+//            case r : return 0;
+//            case g : return 1;
+//            case b : return 2;
+//        }
+//    }
+//}
 
 class RockPaperScissors
 {
