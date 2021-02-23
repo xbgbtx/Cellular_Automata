@@ -13,6 +13,7 @@
         <script src="https://cdn.jsdelivr.net/npm/p5@1.2.0/lib/p5.js"></script>
         <script type="text/javascript" src="ca.js" ></script>
         <script type="text/javascript" src="ca_rules.js" ></script>
+        <script type="text/javascript" src="ca_sim_buffer.js" ></script>
 
         <title>Cellular Automata</title>
 
@@ -51,8 +52,23 @@
                     <label for="spont_slider" class="control_item" >
                        Spontenaeity
                     </label>
-                    <input type="range" min="0" max="1" value="0" step="0.01"
+                    <input type="range" min="0" max="0.1" value="0" step="0.01"
+                        class="control_item" autocomplete="off"
                         id="spont_slider" onchange="spont_slider_move()" />
+                    <label for="gridsize_select" class="control_item">
+                       Resize Sim:
+                    </label>
+                    <select name="gridsize_select" 
+                       id="gridsize_select" class="control_item"
+                       autocomplete="off"
+                       onchange="gridsize_selection()"
+                       >
+                       <option value="512">512 x 512</option>
+                       <option value="256">256 x 256</option>
+                       <option value="128">128 x 128</option>
+                       <option value="64" selected="selected">64 x 64</option>
+                       <option value="32">32 x 32</option>
+                    </select>
                  </div>
               </div> 
 
