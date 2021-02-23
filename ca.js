@@ -9,10 +9,6 @@ const cell_width = screen_width / sim_width;
 const cell_height = screen_height / sim_height;
 
 const state_count = 2;
-const state_bits = 1;
-const state_buffer_size = Math.pow ( state_count, 9 );
-
-let state_buffer;
 
 let sim_buffer_0, sim_buffer_1;
 
@@ -34,9 +30,6 @@ function setup ()
     sim_buffer_0 = new Uint8ClampedArray ( sim_size );
     sim_buffer_1 = new Uint8ClampedArray ( sim_size );
 
-    state_buffer = new Uint8ClampedArray ( state_buffer_size );
-
-    randomize_buffer ( state_buffer, state_count );
     randomize_buffer ( sim_buffer_0, state_count );
 
     colorMode ( HSB, 255 );
@@ -45,7 +38,6 @@ function setup ()
     randomise_state_button.position ( 20, screen_height + 100 );
     randomise_state_button.mousePressed ( () => 
     {
-        randomize_buffer ( state_buffer, state_count );
         randomize_buffer ( sim_buffer_0, state_count );
     });
 }
@@ -80,12 +72,12 @@ function cell_next ( val, idx, arr )
     let local_idxs = get_local_idxs ( idx, sim_width, sim_height );
     let local_vals = local_idxs.map ( l => arr [ l ] )
 
-    let next_state = local_vals.reduce ( ( a, v, i ) =>
+    let alive = local_vals.reduce ( ( a, v, i ) =>
     {
-        return a | ( v << ( i * state_bits ) );
-    });
+        return a + ( v == 1 );
+    }, 0);
 
-    return state_buffer [ next_state ];
+    return ( alive == 2 || alive == 3 ) ? 1 : 0;
 }
 
 function draw_cell ( val, idx ) 
