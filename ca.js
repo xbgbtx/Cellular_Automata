@@ -23,9 +23,12 @@ const colors = [
     [ 240, 255, 250, a ],
 ];
 
+let spontenaeity=0;
+
 function setup ()
 {
-    createCanvas ( screen_width, screen_height );
+    let canvas = createCanvas ( screen_width, screen_height );
+    canvas.parent ( "canvas_div" );
     
     sim_buffer_0 = new Uint8ClampedArray ( sim_size );
     sim_buffer_1 = new Uint8ClampedArray ( sim_size );
@@ -36,13 +39,6 @@ function setup ()
 
     randomize_buffer ( sim_buffer_0, rule.states );
     colorMode ( HSB, 255 );
-
-    randomise_state_button = createButton ( 'random rules' );
-    randomise_state_button.position ( 20, screen_height + 100 );
-    randomise_state_button.mousePressed ( () => 
-    {
-        randomize_buffer ( sim_buffer_0, rule.states );
-    });
 }
 
 function draw () 
@@ -62,6 +58,31 @@ function draw ()
     //noLoop ();
 }
 
+function randomize_button_click ()
+{
+    randomize_buffer ( sim_buffer_0, rule.states );
+}
+
+function rule_selection ()
+{
+    let el = document.getElementById ( "rule_select" );
+
+    switch ( el.value )
+    {
+        case "life" : rule = new Life (); break;
+        case "rps" : rule = new RockPaperScissors (); break;
+        case "majority" : rule = new Majority (); break;
+    }
+    //:w
+    //randomize_buffer ( sim_buffer_0, rule.states );
+}
+
+function spont_slider_move ()
+{
+    let el = document.getElementById ( "spont_slider" );
+    spontenaeity = el.value;
+}
+
 function flip_sim_buffers ()
 {
     let tmp = sim_buffer_0;
@@ -72,10 +93,16 @@ function flip_sim_buffers ()
 
 function cell_next ( val, idx, arr )
 {
-    let local_idxs = neighbours ( idx, sim_width, sim_height );
-    let local_vals = local_idxs.map ( l => arr [ l ] )
-
-    return rule.process_cell ( val, local_vals );
+    if ( random () >= spontenaeity )
+    {
+        let local_idxs = neighbours ( idx, sim_width, sim_height );
+        let local_vals = local_idxs.map ( l => arr [ l ] )
+        return rule.process_cell ( val, local_vals );
+    }
+    else
+    {
+        return ( val + 1 ) % rule.states;
+    }
 }
 
 function draw_cell ( val, idx ) 

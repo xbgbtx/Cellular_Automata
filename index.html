@@ -24,7 +24,37 @@
            <div id="root_div">
               <h1>Cellular Automata</h1>
 
-              <div id="canvas_div"></div>
+              <div id="app_div" class="flexrow" >
+                 <div id="canvas_div"></div>
+
+                 <div id="control_div" class="flexcol" >
+
+                    <label for="randomise" class="control_item">
+                       Randomise the Grid:
+                    </label>
+                    <button onclick="randomize_button_click()" 
+                            class="control_item" id="randomise">
+                       Randomise
+                    </button>
+                    <label for="rule_select" class="control_item">
+                       Select Rule:
+                    </label>
+                    <select name="rule_select" 
+                       id="rule_select" class="control_item"
+                       autocomplete="off"
+                       onchange="rule_selection()"
+                       >
+                       <option value="life">Life</option>
+                       <option value="majority">Majority</option>
+                       <option value="rps">Rock Paper Scissors</option>
+                    </select>
+                    <label for="spont_slider" class="control_item" >
+                       Spontenaeity
+                    </label>
+                    <input type="range" min="0" max="1" value="0" step="0.01"
+                        id="spont_slider" onchange="spont_slider_move()" />
+                 </div>
+              </div> 
 
            </div>
         </main>
